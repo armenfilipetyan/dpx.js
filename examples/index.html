@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'/>
+    <script type="text/javascript" src="../lib/dpx-fe.js"></script>
+    <style>
+        html, body { min-height: 100%; }
+        body { position: relative; margin: 0px; text-align: center; background-color: #222; color: #eee; font-family: 'Arial', Sans-Serif; }
+        h1 { color: #ccc; font-family: Sans-Serif; text-transform: uppercase; font-weight: 400; } 
+        ul { list-style: none; }
+        canvas { background-color: #000; padding: 0px; margin: 10%; width: 80%; height: 50%; }
+        #drop-zone { position: absolute; top: 0; margin: 10%; width: 80%; height: 80%; z-index: 10; border: 1px dashed #ccc; }
+    </style>
+  </head>
+  <body>
+    <h1>DPX Image Drag and Drop</h1>
+    <canvas id='mycanvas'></canvas>
+    <div id="drop-zone">Drop files here</div>
+    <output id="list" style="list-style: none;"></output>
+  </body>
+
+<script>
+function handleFileSelect(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+
+    var files = evt.dataTransfer.files; // FileList object.
+
+    // files is a FileList of File objects. List some properties.
+    var output = [];
+    for (var i = 0, f; f = files[i]; i++) {
+
+        output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
+            f.size, ' bytes, last modified: ',
+            f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
+        '</li>');
+
+        var imgheader = f.slice( 0, 8192 );
+        var img = f.slice( 8192, f.size );
+        var reader = new FileReader();
+
+        reader.onloadend = function(evt) {
+            if (evt.target.readyState == FileReader.DONE) { // DONE == 2
+                var dpx = new DPXFile( evt.target.result );
+                if ( evt.target.result.length == 8192 ) {
+                    imginfo = dpx.DPXImageInfo();
+                    fileinfo = dpx.DPXFileInfo();
+                    orientation = dpx.DPXOrientationInfo();
+                    console.log( imginfo ); 
+                    console.log( fileinfo ); 
+                    console.log( orientation ); 
+
+                    canvas = document.getElementById( 'mycanvas' );
+                    canvas.width = imginfo['width']; 
+                    canvas.height = imginfo['height'];
+
+                    reader.readAsBinaryString( img );
+                } else {
+                    var imgData = evt.target.result;
+                    dpx.render10Bit( 'mycanvas', imgData );
+                }
+            }
+        };
+        reader.readAsBinaryString( imgheader );
+    }
+    document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+}
+
+function handleDragOver(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+}
+
+// Setup the drag and drop event listeners.
+var dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover', handleDragOver, false);
+dropZone.addEventListener('drop', handleFileSelect, false);
+</script>
+</html>
