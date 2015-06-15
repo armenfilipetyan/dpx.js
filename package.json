@@ -1,0 +1,30 @@
+{
+  "name": "dpx-image",
+  "version": "0.1.0",
+  "description": "Native Javascript DPX Image Reader",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/armenfilipetyan/dpx.js.git"
+  },
+  "keywords": [
+    "image",
+    "dpx",
+    "cin",
+    "cineon",
+    "format",
+    "native",
+    "sdpx"
+  ],
+  "author": "armenfilipetyan",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "gulp": "^3.8.8",
+    "gulp-uglify": "^1.0.1",
+    "gulp-notify": "*",
+    "gulp-jshint": "*"
+  },
+  "dependencies": {
+  }
+}
